@@ -1,0 +1,28 @@
+name: Linux
+
+on:
+  push:
+    branches: [ "main" ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        platform: [ host, arm, rv64 ]
+        build_type: [ Debug, Release ]
+    
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: dtcxzyw/checkout@main
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qemu-user gcc-riscv64-linux-gnu g++-riscv64-linux-gnu gcc-arm-linux-gnueabi g++-arm-linux-gnueabi cmake
+
+      - name: Build and test
+        run: |
+          ./tests/test_cross.sh ${{matrix.build_type}} ${{matrix.platform}}
